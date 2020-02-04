@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Functionality and UX adjustments for related to landscape photos.
+ */
+
+use Drupal\file\FileInterface;
+use lsolesen\pel\PelJpeg;
+use lsolesen\pel\PelTag;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function image_exif_fix_file_insert(FileInterface $file) {
+  if (!file_exists($file->getFileUri()) || file_validate_extensions($file, 'jpg jpeg')) {
+    return;
+  }
+
+  $image = new PelJpeg($file->getFileUri());
+
+  try {
+    $entry = $image->getExif()
+      ->getTiff()
+      ->getIfd()
+      ->getEntry(PelTag::ORIENTATION);
+
+    $orientation = $entry->getValue();
+
+    $entry->setValue(1);
+    $image->saveFile($file->getFileUri());
+
+    $compensator_operations = [
+      3 => 180,
+      6 => 270,
+      8 => 90,
+    ];
+
+    if (isset($compensator_operations[$orientation])) {
+      /** @var \Drupal\Core\Image\ImageInterface $image */
+      $image = \Drupal::service('image.factory')->get($file->getFileUri());
+      $image->rotate($compensator_operations[$orientation]);
+      $image->save();
+    }
+  }
+  catch (\Error $e) {
+    // Noop.
+  }
+}

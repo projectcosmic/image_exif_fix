@@ -1,0 +1,17 @@
+{
+    "name": "projectcosmic/image_exif_fix",
+    "description": "Cleans managed image files of any orientation EXIF data.",
+    "type": "drupal-module",
+    "authors": [
+        {
+            "name": "Justin Wong",
+            "email": "justin@cosmic.org.uk",
+            "homepage": "https://cosmic.org.uk",
+            "role": "Developer"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "lsolesen/pel": "^0.9.6"
+    }
+}
