@@ -32,8 +32,8 @@ function image_exif_fix_file_insert(FileInterface $file) {
 
     $compensator_operations = [
       3 => 180,
-      6 => 270,
-      8 => 90,
+      6 => 90,
+      8 => 270,
     ];
 
     if (isset($compensator_operations[$orientation])) {

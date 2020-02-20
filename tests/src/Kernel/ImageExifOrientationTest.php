@@ -35,14 +35,30 @@ class ImageExifOrientationTest extends KernelTestBase {
 
   /**
    * Tests images are rotated.
+   *
+   * @dataProvider operationImageProvider
    */
-  public function testOperations() {
-    file_unmanaged_copy(__DIR__ . '/../../fixtures/image.jpg', 'public://image.jpg');
-    File::create(['uri' => 'public://image.jpg'])->save();
+  public function testOperations($file) {
+    $uri = "public://$file";
+    $this->container
+      ->get('file_system')
+      ->copy(__DIR__ . "/../../fixtures/$file", $uri);
+    File::create(['uri' => $uri])->save();
 
-    $image = imagecreatefromjpeg('public://image.jpg');
+    $image = imagecreatefromjpeg($uri);
     $pixel = imagecolorat($image, 0, 0);
     $this->assertGreaterThan(240, $pixel & 0xFF, 'Image has been rotated.');
+  }
+
+  /**
+   * Provides test image cases for ::testOperations().
+   */
+  public function operationImageProvider() {
+    return [
+      ['image90.jpg'],
+      ['image180.jpg'],
+      ['image270.jpg'],
+    ];
   }
 
 }
